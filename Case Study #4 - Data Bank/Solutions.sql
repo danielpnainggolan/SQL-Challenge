@@ -54,9 +54,28 @@ row_number() over(partition by customer_id order by txn_date) ff
 from customer_transactions
 where txn_type ='deposit' and customer_id in (select distinct customer_id 
 from customer_transactions 
-where txn_type in ('pirchase','withdrawal'))
+where txn_type in ('purchase','withdrawal'))
 order by 1,2 asc)
 
-select distinct month, customer_id
+select month, count(*) total_customers
 from df
 where ff>1
+group by 1;
+
+
+#number 4
+with depo as(
+select customer_id, month(txn_date) bulan, sum(txn_amount) jumlah
+from customer_transactions
+where txn_type ='deposit'
+group by 1,2
+order by 1 asc)
+
+select d.customer_id,d.bulan,if(ct.jumlahs is NULL,d.jumlah-0,d.jumlah-ct.jumlahs) selisih
+from depo d
+left join (select customer_id, month(txn_date) bulans, sum(txn_amount) jumlahs
+from customer_transactions 
+where txn_type in ('purchase','withdrawal')
+group by 1,2
+order by 1 asc) ct
+on d.customer_id = ct.customer_id and d.bulan = ct.bulans;
