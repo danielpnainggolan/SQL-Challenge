@@ -75,3 +75,31 @@ limit 1;
 select calender_year, platform, round(avg(transactions),2) amount
 from clean_weekly_sales
 group by 1,2;
+
+
+
+#Before & After Analysis
+with befored as(
+select week_date, week_number,month_number, calender_year, sales
+from clean_weekly_sales 
+where week_number in (1,2) and month_number = 6 and calender_year = 2020
+union
+select week_date, week_number,month_number, calender_year, sales
+from clean_weekly_sales 
+where week_number in (3,4) and month_number = 5 and calender_year = 2020
+union
+select week_date, week_number,month_number, calender_year, sales
+from clean_weekly_sales 
+where week_number in (1,2) and month_number = 7 and calender_year = 2020),
+
+aftered as(select * from befored where week_number in (1,2) and month_number = 7 and calender_year = 2020
+union
+select week_date, week_number,month_number, calender_year, sales
+from clean_weekly_sales 
+where week_number in (3,4) and month_number = 6 and calender_year = 2020)
+
+
+select sum(sales) amount_before ,
+(select sum(sales)  from aftered) amount_after
+from befored
+where month_number in (5,6) and week_number in (1,2,3,4);
