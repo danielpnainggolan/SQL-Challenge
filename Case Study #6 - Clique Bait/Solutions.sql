@@ -71,6 +71,28 @@ from clique_bait.events e
 join (select page_id, product_id
 from clique_bait.page_hierarchy
 where product_id is not null) a
-on e.page_id = a.page_id) b
+on e.page_id = a.page_id
+where e.event_type = 3) b
 group by 1
-order by 2 desc;
+order by 2 desc
+limit 3;
+
+
+
+
+
+belum kelar untuk yang 3. Product Funnel Analysis
+
+select b.product_id, count(b.*) times_by_viewed from (
+select e.visit_id, e.page_id, a.product_id,e.event_type
+from clique_bait.events e
+join (select page_id, product_id
+from clique_bait.page_hierarchy
+where product_id is not null) a
+on e.page_id = a.page_id
+where e.event_type = 1) b
+group by 1
+order by 2 desc
+limit 3;
+
+
