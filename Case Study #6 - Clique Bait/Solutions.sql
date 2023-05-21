@@ -96,3 +96,16 @@ order by 2 desc
 limit 3;
 
 
+
+with part as(
+select *, dense_rank() over(partition by purchase_id order by dates) ranking, 
+lag(dates) over(partition by purchase_id order by dates) as dated
+from purchase_log)
+
+select if(status='processed','cteeated to processed','processed to delivered') status,  avg(datediff(dates,dated)) average 
+from part
+where dated is not null
+group by 1;
+
+
+
